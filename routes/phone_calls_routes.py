@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 
 from repository.device_repo import get_device_by_method, get_device_with_better_connection, \
-   get_connection_count_to_device, devices_have_connection_check
+   get_connection_count_to_device, devices_have_connection_check, device_last_connection
 from service.call_register_service import register_call
 from service.data_normalization import extract_normalized_devices
 
@@ -33,3 +33,8 @@ def has_connection():
    device2_id = request.json["id2"]
    res = devices_have_connection_check(device1_id, device2_id)
    return jsonify(res), 200
+
+@phone_blueprint.route("/device_last_connection/<string:device_id>", methods=['GET'])
+def get_last_connection(device_id):
+   res = device_last_connection(device_id)
+   return jsonify(res.value_or(None)), 200
