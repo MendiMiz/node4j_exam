@@ -19,9 +19,15 @@ def get_all_devices():
 def get_device_by_method(method: str):
     with driver.session() as session:
         query = """
-        MATCH p = (d1:Device)-[rel:CALL*]->(d2:Device)
-        WHERE all(r IN relationships(p) WHERE r.method = $method)
-        RETURN p AS path, length(p) AS path_length
+        MATCH (start:Device)
+        MATCH (end:Device)
+        WHERE start <> end
+        MATCH path = shortestPath((start)-[:CALL*]->(end))
+        WHERE ALL(r IN relationships(path) WHERE r.method = $method)
+        WITH path, length(path) as pathLength
+        ORDER BY pathLength DESC
+        LIMIT 1
+        RETURN path, pathLength
         """
 
         params = {
