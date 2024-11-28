@@ -64,6 +64,25 @@ def get_connection_count_to_device(device_id: str):
         return Maybe.from_optional(res)
 
 
+def devices_have_connection_check(device1_id, device2_id):
+    with driver.session() as session:
+        query = """
+        MATCH (d1:Device {id: $id1})-[rel:CALL]-(d2:Device {id: $id2})
+        RETURN count(d2) 
+        """
+
+        params = {
+            "id1": device1_id,
+            "id2": device2_id
+        }
+
+        res = session.run(query, params).single()
+        have_connection = {"have_connection": bool(res["count(d2)"])}
+        return have_connection
+
+device1 = "b789f470-14b0-437a-b879-9b36449c4e7a"
+device2 = "32260d92-740d-4b2c-9a6e-3f3d54a1ee96"
+
 
 def insert_device(device: Device):
     with driver.session() as session:
