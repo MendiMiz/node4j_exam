@@ -48,6 +48,21 @@ def get_device_with_better_connection(signal_strength: float):
 
         return Maybe.from_optional(res)
 
+def get_connection_count_to_device(device_id: str):
+    with driver.session() as session:
+        query = """
+        MATCH (d1:Device {id: $id})<-[rel:CALL]-(d2:Device)
+        RETURN count(d2) as connections
+        """
+
+        params = {
+            "id": device_id
+        }
+
+        res = session.run(query, params).data()
+
+        return Maybe.from_optional(res)
+
 
 
 def insert_device(device: Device):
