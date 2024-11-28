@@ -32,6 +32,21 @@ def get_device_by_method(method: str):
 
         return Maybe.from_optional(res)
 
+def get_device_with_better_connection(signal_strength: float):
+    with driver.session() as session:
+        query = """
+        MATCH (d1:Device)-[rel:CALL]->(d2:Device)
+        WHERE rel.signal_strength_dbm > $signal_strength
+        RETURN d1, d2
+        """
+
+        params = {
+            "signal_strength": signal_strength
+        }
+
+        res = session.run(query, params).data()
+
+        return Maybe.from_optional(res)
 
 
 
