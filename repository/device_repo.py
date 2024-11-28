@@ -1,7 +1,4 @@
-from xml.etree.ElementTree import indent
-
 import toolz as t
-from flask import jsonify
 from returns.maybe import Maybe
 from db.database import driver
 from db.models.device import Device
