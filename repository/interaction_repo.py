@@ -31,6 +31,6 @@ def create_call_relationship(interaction: Interaction):
             "timestamp": str(interaction.timestamp)
         }
 
-        res = session.run(query, params).data()
+        res = session.run(query, params).single()
 
-        return Maybe.from_optional(res)
+        return Maybe.from_optional(res.get("r")._properties)

@@ -12,7 +12,7 @@ def register_call(raw_call):
     inserted_devices =  t.pipe(
         raw_call,
         extract_normalized_devices,
-        (lambda calls: [insert_device(call) for call in calls])
+        (lambda calls: [insert_device(call).value_or(None) for call in calls])
     )
 
     # insert call relation after normalization
@@ -21,8 +21,7 @@ def register_call(raw_call):
         extract_normalized_interaction,
         create_call_relationship
         )
-
-    return {"devices": inserted_devices, "call_rel": inserted_call_relation}
+    return {"devices": inserted_devices, "call_rel": inserted_call_relation.value_or(None)}
 
 def device_calling_himself(raw_data):
     return raw_data["devices"][0]["id"] == raw_data["devices"][1]["id"]
