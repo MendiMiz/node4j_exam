@@ -1,4 +1,7 @@
+from xml.etree.ElementTree import indent
+
 import toolz as t
+from flask import jsonify
 from returns.maybe import Maybe
 from db.database import driver
 from db.models.device import Device
@@ -19,8 +22,9 @@ def get_all_devices():
 def get_device_by_method(method: str):
     with driver.session() as session:
         query = """
-        MATCH (d1:Device)-[rel:CALL {method: $method}]->(d2:Device)
-        RETURN d1, rel, d2
+        MATCH p = (d1:Device)-[rel:CALL*]->(d2:Device)
+        WHERE all(r IN relationships(p) WHERE r.method = $method)
+        RETURN p AS path, length(p) AS path_length
         """
 
         params = {
@@ -31,9 +35,7 @@ def get_device_by_method(method: str):
 
         return Maybe.from_optional(res)
 
-res = (get_device_by_method("WiFi").value_or(None))
-res_d1 = [call["d1"] for call in res]
-print(res_d1)
+
 
 
 def insert_device(device: Device):
